@@ -86,8 +86,7 @@ applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewB
   retract(boardShape(BoardShape)), assert(boardShape(NewBoardShape)), % Remove the old board from the KB and store the new one
   retract(boardHole(BoardHole)), assert(boardHole(NewBoardHole)), % Remove the old board from the KB and store the new one
   retract(boardColor(BoardColor)), assert(boardColor(NewBoardColor)),
-  applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, RemainingPieces, NewRemainingPieces)
-
+  retract(remainingPieces(RemainingPieces)), assert(remainingPieces(RemainingPieces)),
 
 
 
