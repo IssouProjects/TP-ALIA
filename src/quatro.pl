@@ -38,17 +38,27 @@ play(Player, BoardSize, BoardShape, BoardHole, BoardColor, RemainingPieces):- ga
 play(Player, BoardSize, BoardShape, BoardHole, BoardColor, RemainingPieces):-
     boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), % instantiate the boards
     displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), % print it
-    write(Player), writeln('choose a piece for your opponent:'),
-    iaChoosePiece(BoardSize, BoardShape, BoardHole, BoardColor,Piece,Player, RemainingPieces), % ask the AI to choose a piece for the opponnent
+    write(Player), writeln(' choose a piece for your opponent:'),
+    iaChoosePiece(BoardSize, BoardShape, BoardHole, BoardColor,Piece,Player, RemainingPieces, NewRemainingPieces), % ask the AI to choose a piece for the opponnent
     changePlayer(Player, NextPlayer), % change to the player that will place the spiece
-    write(Player), writeln( 'play the piece:'),
+    write(Player), writeln( ' play the piece:'),
     iaChooseMove(BoardSize, BoardShape, BoardHole, BoardColor, Piece, Move, Player), %
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
-    applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one
+    applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, Piece, RemainingPieces), % Remove the old board from the KB and store the new one
     play(NextPlayer, BoardSize, BoardShape, BoardHole, BoardColor, RemainingPieces). % next turn!
 
 
-iaChoosePiece(BoardSize,BoardShape,BoardHole,BoardColor,Piece,Player,RemainingPieces) :- repeat, length(RemainingPieces, NumberPieces), random(1, NumberPieces, IndexPiece), nth0(IndexPiece, RemainingPieces, Piece).
+iaChoosePiece(BoardSize,BoardShape,BoardHole,BoardColor,Piece,Player,RemainingPieces, NewRemainingPieces) :-
+  RemainingPieces = NewRemainingPieces,
+  repeat,
+  length(RemainingPieces, NumberPieces),
+  random(1, NumberPieces, IndexPiece),
+  % pick a piece
+  nth0(IndexPiece, RemainingPieces, Piece),
+  % Remove the old board from the KB and store the new one
+  supprime(Piece,RemainingPieces, NewRemainingPieces),
+  retract(remainingPieces(RemainingPieces)),
+  assert(remainingPieces(NewRemainingPieces)). 
 
 changePlayer(0,1).
 changePlayer(1,0).
@@ -72,11 +82,16 @@ playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize
   playMoveBoard(BoardHole,Move,Hole,NewBoardHole), % Play the move and get the result in a new Board
   playMoveBoard(BoardColor,Move,Color,NewBoardColor). % Play the move and get the result in a new Board
 
-applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor) :- % Remove the old board from the KB and store the new one
+applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, Piece, RemainingPieces, NewRemainingPieces) :- % Remove the old board from the KB and store the new one
   retract(boardSize(BoardSize)), assert(boardSize(NewBoardSize)), % Remove the old board from the KB and store the new one
   retract(boardShape(BoardShape)), assert(boardShape(NewBoardShape)), % Remove the old board from the KB and store the new one
   retract(boardHole(BoardHole)), assert(boardHole(NewBoardHole)), % Remove the old board from the KB and store the new one
-  retract(boardColor(BoardColor)), assert(boardColor(NewBoardColor)). % Remove the old board from the KB and store the new one
+  retract(boardColor(BoardColor)), assert(boardColor(NewBoardColor)).
+
+
+supprime(X,[],[]).
+supprime(X,[X|L1],L2):-supprime(X,L1,L2).
+supprime(X,[Z|L1],[Z|L2]):-supprime(X,L1,L2),X\==Z.
 
 % Check if the game is won
 win(BoardSize, BoardShape, BoardHole, BoardColor):- winBoard(BoardSize); winBoard(BoardHole); winBoard(BoardShape); winBoard(BoardColor).
