@@ -58,7 +58,8 @@ iaChoosePiece(Piece,RemainingPieces, NewRemainingPieces) :-
   random(1, NumberPieces, IndexPiece),
   % pick a piece
   nth0(IndexPiece, RemainingPieces, Piece),
-  supprime(Piece,RemainingPieces, NewRemainingPieces).
+  supprime(Piece,RemainingPieces, NewRemainingPieces),
+  retract(remainingPieces(RemainingPieces)), assert(remainingPieces(NewRemainingPieces)).
   
 
 changePlayer(0,1).
@@ -84,8 +85,8 @@ applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewB
   retract(boardSize(BoardSize)), assert(boardSize(NewBoardSize)), % Remove the old board from the KB and store the new one
   retract(boardShape(BoardShape)), assert(boardShape(NewBoardShape)), % Remove the old board from the KB and store the new one
   retract(boardHole(BoardHole)), assert(boardHole(NewBoardHole)), % Remove the old board from the KB and store the new one
-  retract(boardColor(BoardColor)), assert(boardColor(NewBoardColor)),
-  retract(remainingPieces(RemainingPieces)), assert(remainingPieces(NewRemainingPieces)).
+  retract(boardColor(BoardColor)), assert(boardColor(NewBoardColor)).
+  
 
 
 
