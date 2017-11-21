@@ -37,15 +37,14 @@ initPieces(RemainingPieces) :-
 play(Player):- gameover(), write('Game is Over. Winner: '), writeln(Player),boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), displayBoard(BoardSize, BoardShape, BoardHole, BoardColor).
 play(Player):-
     boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
-    length(RemainingPieces, NumberPieces), writeln(NumberPieces), % instantiate the boards
     displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), % print it
     write(Player), writeln(' choose a piece for your opponent:'),
-    iaChoosePiece(Piece, RemainingPieces, NewRemainingPieces), % ask the AI to choose a piece for the opponnent
+    iaChoosePiece(Piece, RemainingPieces), % ask the AI to choose a piece for the opponnent
     changePlayer(Player, NextPlayer), % change to the player that will place the spiece
     write(Player), writeln( ' play the piece:'),
     iaChooseMove(BoardSize, Move), %
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
-    applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, RemainingPieces, NewRemainingPieces), % Remove the old board from the KB and store the new one
+    applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one
     play(NextPlayer). % next turn!
 
 
@@ -53,7 +52,7 @@ supprime(_,[],[]).
 supprime(X,[X|B],S) :- supprime(X,B,S), !.
 supprime(X,[Y|B],[Y|S]) :- supprime(X,B,S).
 
-iaChoosePiece(Piece,RemainingPieces, NewRemainingPieces) :-
+iaChoosePiece(Piece,RemainingPieces) :-
   length(RemainingPieces, NumberPieces),
   random(1, NumberPieces, IndexPiece),
   % pick a piece
@@ -81,7 +80,7 @@ playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize
   playMoveBoard(BoardHole,Move,Hole,NewBoardHole), % Play the move and get the result in a new Board
   playMoveBoard(BoardColor,Move,Color,NewBoardColor). % Play the move and get the result in a new Board
 
-applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, RemainingPieces, NewRemainingPieces) :- % Remove the old board from the KB and store the new one
+applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor) :- % Remove the old board from the KB and store the new one
   retract(boardSize(BoardSize)), assert(boardSize(NewBoardSize)), % Remove the old board from the KB and store the new one
   retract(boardShape(BoardShape)), assert(boardShape(NewBoardShape)), % Remove the old board from the KB and store the new one
   retract(boardHole(BoardHole)), assert(boardHole(NewBoardHole)), % Remove the old board from the KB and store the new one
