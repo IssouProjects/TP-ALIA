@@ -11,8 +11,9 @@ init :- length(BoardShape, 16), assert(boardShape(BoardShape)),
         length(BoardHole, 16), assert(boardHole(BoardHole)),
         length(BoardSize, 16), assert(boardSize(BoardSize)),
         length(RemainingPieces, 16), assert(remainingPieces(RemainingPieces)),
+        remainingPieces(RemainingPieces),
         initPieces(RemainingPieces),
-        play(0, BoardSize, BoardShape, BoardHole, BoardColor, RemainingPieces).
+        play(0, RemainingPieces).
 
 initPieces(RemainingPieces) :-
     Piece1 = [0, 0, 0, 0],
@@ -34,43 +35,41 @@ initPieces(RemainingPieces) :-
     RemainingPieces = [Piece1, Piece2, Piece3, Piece4, Piece5, Piece6, Piece7, Piece8, Piece9, Piece10, Piece11, Piece12, Piece13, Piece14, Piece15, Piece16].
 
 
-play(Player, BoardSize, BoardShape, BoardHole, BoardColor, RemainingPieces):- gameover(BoardSize, BoardShape, BoardHole, BoardColor, Player).
-play(Player, BoardSize, BoardShape, BoardHole, BoardColor, RemainingPieces):-
-    boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), % instantiate the boards
+%play(Player):- gameover(), write('Game is Over. Winner: '), writeln(Player).
+play(Player, RemainingPieces):-
+    boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor),
+    length(RemainingPieces, NumberPieces), writeln(NumberPieces), % instantiate the boards
     displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), % print it
     write(Player), writeln(' choose a piece for your opponent:'),
-    iaChoosePiece(BoardSize, BoardShape, BoardHole, BoardColor,Piece,Player, RemainingPieces, NewRemainingPieces), % ask the AI to choose a piece for the opponnent
+    iaChoosePiece(Piece, RemainingPieces, NewRemainingPieces), % ask the AI to choose a piece for the opponnent
     changePlayer(Player, NextPlayer), % change to the player that will place the spiece
     write(Player), writeln( ' play the piece:'),
-    iaChooseMove(BoardSize, BoardShape, BoardHole, BoardColor, Piece, Move, Player), %
+    iaChooseMove(BoardSize, Move), %
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
-    applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, Piece, RemainingPieces), % Remove the old board from the KB and store the new one
-    play(NextPlayer, BoardSize, BoardShape, BoardHole, BoardColor, RemainingPieces). % next turn!
+    applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, RemainingPieces, NewRemainingPieces), % Remove the old board from the KB and store the new one
+    play(NextPlayer, RemainingPieces). % next turn!
 
 
-iaChoosePiece(BoardSize,BoardShape,BoardHole,BoardColor,Piece,Player,RemainingPieces, NewRemainingPieces) :-
-  RemainingPieces = NewRemainingPieces,
-  repeat,
+supprime(_,[],[]).
+supprime(X,[X|B],S) :- supprime(X,B,S), !.
+supprime(X,[Y|B],[Y|S]) :- supprime(X,B,S).
+
+iaChoosePiece(Piece,RemainingPieces, NewRemainingPieces) :-
   length(RemainingPieces, NumberPieces),
   random(1, NumberPieces, IndexPiece),
   % pick a piece
   nth0(IndexPiece, RemainingPieces, Piece),
-  % Remove the old board from the KB and store the new one
-  supprime(Piece,RemainingPieces, NewRemainingPieces),
-  retract(remainingPieces(RemainingPieces)),
-  assert(remainingPieces(NewRemainingPieces)). 
+  supprime(Piece,RemainingPieces, NewRemainingPieces).
+  
 
 changePlayer(0,1).
 changePlayer(1,0).
 
-gameover(BoardSize, BoardShape, BoardHole, BoardColor, Player) :- win(BoardSize, BoardShape, BoardHole, BoardColor).
 
-append([],L,L).
-append([H|T],L,[H|B]) :- append(T,L,B).
 
 playMoveBoard(Board,Move,Piece,NewBoard) :- Board=NewBoard, nth0(Move,NewBoard,Piece).
 
-iaChooseMove(BoardSize, BoardShape, BoardHole, BoardColor, Piece, Move, Player) :- repeat, Index is random(16), nth0(Index, BoardSize, Elem), var(Elem), Move is Index.
+iaChooseMove(BoardSize, Move) :- repeat, Index is random(16), nth0(Index, BoardSize, Elem), var(Elem), Move is Index.
 
 playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor) :-
   nth0(0, Piece, Size),
@@ -82,19 +81,20 @@ playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize
   playMoveBoard(BoardHole,Move,Hole,NewBoardHole), % Play the move and get the result in a new Board
   playMoveBoard(BoardColor,Move,Color,NewBoardColor). % Play the move and get the result in a new Board
 
-applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, Piece, RemainingPieces, NewRemainingPieces) :- % Remove the old board from the KB and store the new one
+applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, RemainingPieces, NewRemainingPieces) :- % Remove the old board from the KB and store the new one
   retract(boardSize(BoardSize)), assert(boardSize(NewBoardSize)), % Remove the old board from the KB and store the new one
   retract(boardShape(BoardShape)), assert(boardShape(NewBoardShape)), % Remove the old board from the KB and store the new one
   retract(boardHole(BoardHole)), assert(boardHole(NewBoardHole)), % Remove the old board from the KB and store the new one
-  retract(boardColor(BoardColor)), assert(boardColor(NewBoardColor)).
+  retract(boardColor(BoardColor)), assert(boardColor(NewBoardColor)),
+  applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, RemainingPieces, NewRemainingPieces)
 
 
-supprime(X,[],[]).
-supprime(X,[X|L1],L2):-supprime(X,L1,L2).
-supprime(X,[Z|L1],[Z|L2]):-supprime(X,L1,L2),X\==Z.
+
+
+gameover() :- win().
 
 % Check if the game is won
-win(BoardSize, BoardShape, BoardHole, BoardColor):- winBoard(BoardSize); winBoard(BoardHole); winBoard(BoardShape); winBoard(BoardColor).
+win():- boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), (winBoard(BoardSize); winBoard(BoardHole); winBoard(BoardShape); winBoard(BoardColor)).
   winBoard(Board) :- Board = [P,Q,R,S,_,_,_,_,_,_,_,_,_,_,_,_], P==Q, Q==R, R==S, nonvar(P). % first row
   winBoard(Board) :- Board = [_,_,_,_,P,Q,R,S,_,_,_,_,_,_,_,_], P==Q, Q==R, R==S, nonvar(P). % second row
   winBoard(Board) :- Board = [_,_,_,_,_,_,_,_,P,Q,R,S,_,_,_,_], P==Q, Q==R, R==S, nonvar(P). % third row
@@ -106,7 +106,7 @@ win(BoardSize, BoardShape, BoardHole, BoardColor):- winBoard(BoardSize); winBoar
   winBoard(Board) :- Board = [P,_,_,_,_,Q,_,_,_,_,R,_,_,_,_,S], P==Q, Q==R, R==S, nonvar(P). % first diagonal
   winBoard(Board) :- Board = [_,_,_,P,_,_,Q,_,_,R,_,_,S,_,_,_], P==Q, Q==R, R==S, nonvar(P). % second diagonal
 
-boardFull(Board) :- isBoardFull([]).
+boardFull([]) :- isBoardFull([]).
 isBoardFull([H|T]):- nonvar(H), isBoardFull(T).
 
 % Display the board
@@ -167,9 +167,9 @@ displayBoard(BoardSize, BoardShape, BoardHole, BoardColor) :- write("===========
 
                 write("|=====|=====|=====|=====|"),write('\n').
 
-printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), var(Val), write('?'),!.
-printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), Val is 1, write(CharTrue).
-printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), Val is 0, write(CharFalse).
+printval(Board,N,_, _) :- nth0(N,Board,Val), var(Val), write('?'),!.
+printval(Board,N,CharTrue, _) :- nth0(N,Board,Val), Val is 1, write(CharTrue).
+printval(Board,N,_, CharFalse) :- nth0(N,Board,Val), Val is 0, write(CharFalse).
 %printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), var(Val), write('?'),!.
 
 % ========================╗
