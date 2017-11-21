@@ -10,10 +10,9 @@ init :- length(BoardShape, 16), assert(boardShape(BoardShape)),
         length(BoardColor, 16), assert(boardColor(BoardColor)),
         length(BoardHole, 16), assert(boardHole(BoardHole)),
         length(BoardSize, 16), assert(boardSize(BoardSize)),
-        length(RemainingPieces, 16), assert(remainingPieces(RemainingPieces)),
-        remainingPieces(RemainingPieces),
         initPieces(RemainingPieces),
-        play(0, RemainingPieces).
+        assert(remainingPieces(RemainingPieces)),
+        play(0).
 
 initPieces(RemainingPieces) :-
     Piece1 = [0, 0, 0, 0],
@@ -35,9 +34,9 @@ initPieces(RemainingPieces) :-
     RemainingPieces = [Piece1, Piece2, Piece3, Piece4, Piece5, Piece6, Piece7, Piece8, Piece9, Piece10, Piece11, Piece12, Piece13, Piece14, Piece15, Piece16].
 
 
-%play(Player):- gameover(), write('Game is Over. Winner: '), writeln(Player).
-play(Player, RemainingPieces):-
-    boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor),
+play(Player):- gameover(), write('Game is Over. Winner: '), writeln(Player),boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), displayBoard(BoardSize, BoardShape, BoardHole, BoardColor).
+play(Player):-
+    boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
     length(RemainingPieces, NumberPieces), writeln(NumberPieces), % instantiate the boards
     displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), % print it
     write(Player), writeln(' choose a piece for your opponent:'),
@@ -47,7 +46,7 @@ play(Player, RemainingPieces):-
     iaChooseMove(BoardSize, Move), %
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
     applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, RemainingPieces, NewRemainingPieces), % Remove the old board from the KB and store the new one
-    play(NextPlayer, RemainingPieces). % next turn!
+    play(NextPlayer). % next turn!
 
 
 supprime(_,[],[]).
