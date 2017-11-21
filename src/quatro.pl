@@ -48,7 +48,7 @@ play(Player, BoardSize, BoardShape, BoardHole, BoardColor, RemainingPieces):-
     play(NextPlayer, BoardSize, BoardShape, BoardHole, BoardColor, RemainingPieces). % next turn!
 
 
-iaChoosePiece(BoardSize,BoardShape,BoardHole,BoardColor,Piece,Player,RemainingPieces) :- repeat, length(RemainingPieces, NumberPieces), Index is random(NumberPieces), nth0(Index, RemainingPieces, Elem), var(Elem), !.
+iaChoosePiece(BoardSize,BoardShape,BoardHole,BoardColor,Piece,Player,RemainingPieces) :- repeat, length(RemainingPieces, NumberPieces), random(1, NumberPieces, IndexPiece), nth0(IndexPiece, RemainingPieces, Piece), var(Piece), writeln(nth0(IndexPiece, RemainingPieces, Piece)).
 
 changePlayer(0,1).
 changePlayer(1,0).
@@ -58,18 +58,15 @@ gameover(BoardSize, BoardShape, BoardHole, BoardColor, Player) :- win(BoardSize,
 append([],L,L).
 append([H|T],L,[H|B]) :- append(T,L,B).
 
-playMoveSize(Board,Move,Piece,NewBoard) :- Board=NewBoard, nth0(0,Piece,Val), nth0(Move,NewBoard,Val).
-playMoveShape(Board,Move,Piece,NewBoard) :- Board=NewBoard, nth0(1,Piece,Val), nth0(Move,NewBoard,Val).
-playMoveHole(Board,Move,Piece,NewBoard) :- Board=NewBoard, nth0(2,Piece,Val), nth0(Move,NewBoard,Val).
-playMoveColor(Board,Move,Piece,NewBoard) :- Board=NewBoard, nth0(3,Piece,Val), nth0(Move,NewBoard,Val).
+playMoveBoard(Board,Move,NewBoard,Player) :- nth0(Move,NewBoard,Player), Board=NewBoard.
 
 iaChooseMove(BoardSize, BoardShape, BoardHole, BoardColor, Piece, Move, Player) :- repeat, Index is random(16), nth0(Index, BoardSize, Elem), var(Elem), !.
 
 playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor) :-
-  playMoveSize(BoardSize,Move,Piece,NewBoardSize), % Play the move and get the result in a new Board
-  playMoveShape(BoardShape,Move,Piece,NewBoardShape), % Play the move and get the result in a new Board
-  playMoveHole(BoardHole,Move,Piece,NewBoardHole), % Play the move and get the result in a new Board
-  playMoveColor(BoardColor,Move,Piece,NewBoardColor). % Play the move and get the result in a new Board
+  playMoveBoard(BoardSize,Move,Piece,NewBoardSize), % Play the move and get the result in a new Board
+  playMoveBoard(BoardShape,Move,Piece,NewBoardShape), % Play the move and get the result in a new Board
+  playMoveBoard(BoardHole,Move,Piece,NewBoardHole), % Play the move and get the result in a new Board
+  playMoveBoard(BoardColor,Move,Piece,NewBoardColor). % Play the move and get the result in a new Board
 
 applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor) :- % Remove the old board from the KB and store the new one
   retract(boardSize(BoardSize)), assert(boardSize(NewBoardSize)), % Remove the old board from the KB and store the new one
@@ -151,10 +148,10 @@ displayBoard(BoardSize, BoardHole, BoardFull, BoardColor) :- write("============
 
                 write("|=====|=====|=====|=====|"),write('\n').
 
-
 printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), var(Val), write('?'),!.
-printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), Val is 1, write(CharTrue).
-printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), Val is 0, write(CharFalse).
+printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), var(Val), Val is 1, write(CharTrue).
+printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), var(Val), Val is 0, write(CharFalse).
+%printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), var(Val), write('?'),!.
 
 % ========================╗
 % | A B | A B | A B | A B |
