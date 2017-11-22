@@ -33,17 +33,18 @@ initPieces(RemainingPieces) :-
     Piece16 = [1, 1, 1, 1],
     RemainingPieces = [Piece1, Piece2, Piece3, Piece4, Piece5, Piece6, Piece7, Piece8, Piece9, Piece10, Piece11, Piece12, Piece13, Piece14, Piece15, Piece16].
 
-reset:- retract(remainingPieces(RemainingPieces)),retract(boardSize(BoardSize)), retract(boardShape(BoardShape)),retract(boardHole(BoardHole)),retract(boardColor(BoardColor)).
+reset():- retract(boardSize(_)), retract(boardColor(_)), retract(boardShape(_)), retract(boardHole(_)), retract(remainingPieces(_)).
 
-play(Player):- gameover(), write('Game is Over. Winner: '), writeln(Player),boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), reset.
+play(Player):- gameover(), write('Game is Over. Winner: '), writeln(Player),boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), reset().
 play(Player):-
     boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
     displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), % print it
     write(Player), writeln(' choose a piece for your opponent:'),
     iaChoosePiece(Piece, RemainingPieces), % ask the AI to choose a piece for the opponnent
     changePlayer(Player, NextPlayer), % change to the player that will place the spiece
-    write(Player), writeln( ' play the piece:'),
-    iaChooseMove(BoardSize, Move), %
+    write(NextPlayer), writeln( ' play the piece:'),
+    iaChooseMove(BoardSize, Move),
+    write(NextPlayer), write( ' played the piece:'), write(Piece), write(' in '), writeln(Move),
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
     applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one
     play(NextPlayer). % next turn!
@@ -73,8 +74,8 @@ playMoveBoard(Board,Move,Piece,NewBoard) :- Board=NewBoard, nth0(Move,NewBoard,P
 playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor) :-
   nth0(0, Piece, Size),
   nth0(1, Piece, Shape),
-  nth0(2, Piece, Hole),
-  nth0(3, Piece, Color),
+  nth0(2, Piece, Color),
+  nth0(3, Piece, Hole),
   playMoveBoard(BoardSize,Move,Size,NewBoardSize), % Play the move and get the result in a new Board
   playMoveBoard(BoardShape,Move,Shape,NewBoardShape), % Play the move and get the result in a new Board
   playMoveBoard(BoardHole,Move,Hole,NewBoardHole), % Play the move and get the result in a new Board
@@ -89,22 +90,23 @@ applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewB
 
 
 
-gameover() :- win().
+gameover() :- win(), !.
+gameover() :- boardShape(BoardShape), isBoardFull(BoardShape).
 
 % Check if the game is won
 win():- boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), (winBoard(BoardSize); winBoard(BoardHole); winBoard(BoardShape); winBoard(BoardColor)).
-  winBoard(Board) :- Board = [P,Q,R,S,_,_,_,_,_,_,_,_,_,_,_,_], P==Q, Q==R, R==S, nonvar(P). % first row
-  winBoard(Board) :- Board = [_,_,_,_,P,Q,R,S,_,_,_,_,_,_,_,_], P==Q, Q==R, R==S, nonvar(P). % second row
-  winBoard(Board) :- Board = [_,_,_,_,_,_,_,_,P,Q,R,S,_,_,_,_], P==Q, Q==R, R==S, nonvar(P). % third row
-  winBoard(Board) :- Board = [_,_,_,_,_,_,_,_,_,_,_,_,P,Q,R,S], P==Q, Q==R, R==S, nonvar(P). % fouth row
-  winBoard(Board) :- Board = [P,_,_,_,Q,_,_,_,R,_,_,_,S,_,_,_], P==Q, Q==R, R==S, nonvar(P). % first column
-  winBoard(Board) :- Board = [_,P,_,_,_,Q,_,_,_,R,_,_,_,S,_,_], P==Q, Q==R, R==S, nonvar(P). % second column
-  winBoard(Board) :- Board = [_,_,P,_,_,_,Q,_,_,_,R,_,_,_,S,_], P==Q, Q==R, R==S, nonvar(P). % third column
-  winBoard(Board) :- Board = [_,_,_,P,_,_,_,Q,_,_,_,R,_,_,_,S], P==Q, Q==R, R==S, nonvar(P). % fourth column
-  winBoard(Board) :- Board = [P,_,_,_,_,Q,_,_,_,_,R,_,_,_,_,S], P==Q, Q==R, R==S, nonvar(P). % first diagonal
-  winBoard(Board) :- Board = [_,_,_,P,_,_,Q,_,_,R,_,_,S,_,_,_], P==Q, Q==R, R==S, nonvar(P). % second diagonal
+  winBoard(Board) :- Board = [P,Q,R,S,_,_,_,_,_,_,_,_,_,_,_,_], P==Q, Q==R, R==S, nonvar(P), write('first row completed. '). % first row
+  winBoard(Board) :- Board = [_,_,_,_,P,Q,R,S,_,_,_,_,_,_,_,_], P==Q, Q==R, R==S, nonvar(P), write('second row completed. '). % second row
+  winBoard(Board) :- Board = [_,_,_,_,_,_,_,_,P,Q,R,S,_,_,_,_], P==Q, Q==R, R==S, nonvar(P), write('third row completed. '). % third row
+  winBoard(Board) :- Board = [_,_,_,_,_,_,_,_,_,_,_,_,P,Q,R,S], P==Q, Q==R, R==S, nonvar(P), write('fourth row completed. '). % fouth row
+  winBoard(Board) :- Board = [P,_,_,_,Q,_,_,_,R,_,_,_,S,_,_,_], P==Q, Q==R, R==S, nonvar(P), write('first column completed. '). % first column
+  winBoard(Board) :- Board = [_,P,_,_,_,Q,_,_,_,R,_,_,_,S,_,_], P==Q, Q==R, R==S, nonvar(P), write('second column completed. '). % second column
+  winBoard(Board) :- Board = [_,_,P,_,_,_,Q,_,_,_,R,_,_,_,S,_], P==Q, Q==R, R==S, nonvar(P), write('third column completed. '). % third column
+  winBoard(Board) :- Board = [_,_,_,P,_,_,_,Q,_,_,_,R,_,_,_,S], P==Q, Q==R, R==S, nonvar(P), write('fourth column completed. '). % fourth column
+  winBoard(Board) :- Board = [P,_,_,_,_,Q,_,_,_,_,R,_,_,_,_,S], P==Q, Q==R, R==S, nonvar(P), write('first diagonal completed. '). % first diagonal
+  winBoard(Board) :- Board = [_,_,_,P,_,_,Q,_,_,R,_,_,S,_,_,_], P==Q, Q==R, R==S, nonvar(P), write('second diagonal completed. '). % second diagonal
 
-boardFull([]) :- isBoardFull([]).
+isBoardFull([]).
 isBoardFull([H|T]):- nonvar(H), isBoardFull(T).
 
 % Display the board
@@ -125,7 +127,7 @@ displayBoard(BoardSize, BoardShape, BoardHole, BoardColor) :- write("===========
 
                 % first line
                 write("| "), printval(BoardSize, 4, 's', 'L'), write(' '), printval(BoardHole, 4, 'f', 'e'),
-                write(" | "), printval(BoardSize, 4, 's', 'L'), write(' '), printval(BoardHole, 5, 'f', 'e'),
+                write(" | "), printval(BoardSize, 5, 's', 'L'), write(' '), printval(BoardHole, 5, 'f', 'e'),
                 write(" | "), printval(BoardSize, 6, 's', 'L'), write(' '), printval(BoardHole, 6, 'f', 'e'),
                 write(" | "), printval(BoardSize, 7, 's', 'L'), write(' '), printval(BoardHole, 7, 'f', 'e'), write(" |"), write('\n'),
 
@@ -166,8 +168,8 @@ displayBoard(BoardSize, BoardShape, BoardHole, BoardColor) :- write("===========
                 write("|=====|=====|=====|=====|"),write('\n').
 
 printval(Board,N,_, _) :- nth0(N,Board,Val), var(Val), write('?'),!.
-printval(Board,N,CharTrue, _) :- nth0(N,Board,Val), Val is 1, write(CharTrue).
-printval(Board,N,_, CharFalse) :- nth0(N,Board,Val), Val is 0, write(CharFalse).
+printval(Board,N, _, CharTrue) :- nth0(N,Board,Val), Val is 1, write(CharTrue).
+printval(Board,N, CharFalse, _) :- nth0(N,Board,Val), Val is 0, write(CharFalse).
 %printval(Board,N,CharTrue, CharFalse) :- nth0(N,Board,Val), var(Val), write('?'),!.
 
 % ========================╗
@@ -183,15 +185,16 @@ printval(Board,N,_, CharFalse) :- nth0(N,Board,Val), Val is 0, write(CharFalse).
 % | A B | A B | A B | A B |
 % | C D | C D | C D | C D |
 % |=====|=====|=====|=====|
-% rond / carré : o / q
+
 % noir / blanc : b / w
 % full / troué : f / e
 % petit / grand : s / L
+% rond / carré : o / q
 
 
 
-% piece = [Size (0 = small, 1 = big),
-%     Shape (0 = round, 1 = square),
-%     Color (0 = black, 1 = white),
-%     Hole (0 = unpierced, 1 = pierced)
+% piece = [Size (0 = small = s, 1 = large  = L),
+%         Shape (0 = round = o, 1 = square = q),
+%         Color (0 = white = w, 1 = black  = b),
+%         Hole  (0 = full  = f, 1 = troue  = e)
 % ]
