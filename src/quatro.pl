@@ -33,8 +33,9 @@ initPieces(RemainingPieces) :-
     Piece16 = [1, 1, 1, 1],
     RemainingPieces = [Piece1, Piece2, Piece3, Piece4, Piece5, Piece6, Piece7, Piece8, Piece9, Piece10, Piece11, Piece12, Piece13, Piece14, Piece15, Piece16].
 
+reset:- retract(remainingPieces(RemainingPieces)),retract(boardSize(BoardSize)), retract(boardShape(BoardShape)),retract(boardHole(BoardHole)),retract(boardColor(BoardColor)).
 
-play(Player):- gameover(), write('Game is Over. Winner: '), writeln(Player),boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), displayBoard(BoardSize, BoardShape, BoardHole, BoardColor).
+play(Player):- gameover(), write('Game is Over. Winner: '), writeln(Player),boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), reset.
 play(Player):-
     boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
     displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), % print it
@@ -59,16 +60,15 @@ iaChoosePiece(Piece,RemainingPieces) :-
   nth0(IndexPiece, RemainingPieces, Piece),
   supprime(Piece,RemainingPieces, NewRemainingPieces),
   retract(remainingPieces(RemainingPieces)), assert(remainingPieces(NewRemainingPieces)).
-  
+
 
 changePlayer(0,1).
 changePlayer(1,0).
 
+iaChooseMove(BoardSize, Move) :- repeat, Index is random(16), nth0(Index, BoardSize, Elem), var(Elem), Move is Index.
 
 
 playMoveBoard(Board,Move,Piece,NewBoard) :- Board=NewBoard, nth0(Move,NewBoard,Piece).
-
-iaChooseMove(BoardSize, Move) :- repeat, Index is random(16), nth0(Index, BoardSize, Elem), var(Elem), Move is Index.
 
 playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor) :-
   nth0(0, Piece, Size),
@@ -85,7 +85,7 @@ applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewB
   retract(boardShape(BoardShape)), assert(boardShape(NewBoardShape)), % Remove the old board from the KB and store the new one
   retract(boardHole(BoardHole)), assert(boardHole(NewBoardHole)), % Remove the old board from the KB and store the new one
   retract(boardColor(BoardColor)), assert(boardColor(NewBoardColor)).
-  
+
 
 
 
@@ -112,7 +112,7 @@ displayBoard(BoardSize, BoardShape, BoardHole, BoardColor) :- write("===========
                 % first line
                 write("| "), printval(BoardSize, 0, 's', 'L'), write(' '), printval(BoardHole, 0, 'f', 'e'),
                 write(" | "), printval(BoardSize, 1, 's', 'L'), write(' '), printval(BoardHole, 1, 'f', 'e'),
-                write(" | "), printval(BoardSize, 2, 's', 'L'), write(' '), printval(BoardHole, 2, 'f', 'e'), 
+                write(" | "), printval(BoardSize, 2, 's', 'L'), write(' '), printval(BoardHole, 2, 'f', 'e'),
                 write(" | "), printval(BoardSize, 3, 's', 'L'), write(' '), printval(BoardHole, 3, 'f', 'e'), write(" |"), write('\n'),
 
                 %second line
