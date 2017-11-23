@@ -1,5 +1,5 @@
 %
-% Affiche du jeu dans la console
+% Affiche l'etat du jeu dans la console
 %
 
 % Display the board
