@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/IssouProjects/TP-ALIA/issues"
   },
-  "homepage": "https://github.com/IssouProjects/TP-ALIA#readme"
+  "homepage": "https://github.com/IssouProjects/TP-ALIA#readme",
+  "dependencies": {
+    "swipl": "^1.0.3"
+  }
 }
