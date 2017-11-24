@@ -2,11 +2,11 @@
 % Verification de la fin d'une partie
 %
 
-gameover() :- win(), !.
+gameover() :- win(BoardSize,BoardHole,BoardColor,BoardShape), !.
 gameover() :- boardShape(BoardShape), isBoardFull(BoardShape).
 
 % Check if the game is won
-win():- boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), (winBoard(BoardSize); winBoard(BoardHole); winBoard(BoardShape); winBoard(BoardColor)).
+win(BoardSize,BoardHole,BoardColor,BoardShape):- boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), (winBoard(BoardSize); winBoard(BoardHole); winBoard(BoardShape); winBoard(BoardColor)).
   winBoard(Board) :- Board = [P,Q,R,S,_,_,_,_,_,_,_,_,_,_,_,_], P==Q, Q==R, R==S, nonvar(P), write('first row completed. '). % first row
   winBoard(Board) :- Board = [_,_,_,_,P,Q,R,S,_,_,_,_,_,_,_,_], P==Q, Q==R, R==S, nonvar(P), write('second row completed. '). % second row
   winBoard(Board) :- Board = [_,_,_,_,_,_,_,_,P,Q,R,S,_,_,_,_], P==Q, Q==R, R==S, nonvar(P), write('third row completed. '). % third row
