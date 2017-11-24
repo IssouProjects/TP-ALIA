@@ -1,12 +1,8 @@
-% Import
-%:- consult(player).
 
 %Check if the other player can't win with this Piece
-winWithThisPiece(_,0,_,_,_,_):-false.
-winWithThisPiece(Piece, N, BoardSize, BoardShape, BoardHole, BoardColor):-
-  M is N-1,
-  Move is M,
-  playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece,
+winWithThisPiece(_,_,_,_,_):-false.
+winWithThisPiece(Piece, BoardSize, BoardShape, BoardHole, BoardColor):-
+  playMove(BoardSize, BoardShape, BoardHole, BoardColor, _, Piece,
   NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
   win(NewBoardSize,NewBoardHole,NewBoardColor,NewBoardShape).
 
@@ -14,7 +10,7 @@ winWithThisPiece(Piece, N, BoardSize, BoardShape, BoardHole, BoardColor):-
 iaChoosePiece(Piece,RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor) :-
   length(RemainingPieces, NumberPieces),
   nth0(_, RemainingPieces, Piece),
-  \+winWithThisPiece(Piece, 16, BoardSize, BoardShape, BoardHole, BoardColor),
+  \+winWithThisPiece(Piece, BoardSize, BoardShape, BoardHole, BoardColor),
   supprime(Piece,RemainingPieces, NewRemainingPieces),
   retract(remainingPieces(RemainingPieces)),
   assert(remainingPieces(NewRemainingPieces)),
@@ -23,10 +19,4 @@ iaChoosePiece(Piece,RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColo
 % If we can only loose, we pick a random Piece
 iaChoosePiece(Piece,RemainingPieces,_,_,_,_):-
   writeln("Le prochain coup sera le coup gagnant."),
-  length(RemainingPieces, NumberPieces),
-  random(1, NumberPieces, IndexPiece),
-  % pick a piece
-  nth0(IndexPiece, RemainingPieces, Piece),
-  supprime(Piece,RemainingPieces, NewRemainingPieces),
-  retract(remainingPieces(RemainingPieces)),
-  assert(remainingPieces(NewRemainingPieces)).
+  chooseRandomPiece(Piece, RemainingPieces).

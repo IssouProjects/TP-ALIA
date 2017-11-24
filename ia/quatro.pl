@@ -4,6 +4,7 @@
 
 :- consult(init).
 :- consult(iaChoosePiece).
+:- consult(chooseRandomPiece).
 :- consult(iaChooseMove).
 :- consult(display).
 :- consult(end).
