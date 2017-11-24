@@ -5,6 +5,7 @@
 :- consult(init).
 :- consult(iaChoosePiece).
 :- consult(iaChooseMove).
+:- consult(iaChooseMove2).
 :- consult(display).
 :- consult(end).
 :- consult(player).
@@ -27,7 +28,8 @@ play(Player):-
     iaChoosePiece(Piece, RemainingPieces), % ask the AI to choose a piece for the opponnent
     changePlayer(Player, NextPlayer), % change to the player that will place the spiece
     write(NextPlayer), writeln( ' play the piece:'),
-    iaChooseMove(BoardSize, Move),
+    %iaChooseMove(BoardSize, Move),
+    iaChooseMove2(Piece, Move),
     write(NextPlayer), write( ' played the piece:'), write(Piece), write(' in '), writeln(Move),
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
     applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one
