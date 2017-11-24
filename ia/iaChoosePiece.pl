@@ -1,6 +1,5 @@
 
-%Check if the other player can't win with this Piece
-winWithThisPiece(_,_,_,_,_):-false.
+%Check if the other player can win with this Piece
 winWithThisPiece(Piece, BoardSize, BoardShape, BoardHole, BoardColor):-
   playMove(BoardSize, BoardShape, BoardHole, BoardColor, _, Piece,
   NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
