@@ -13,18 +13,16 @@ winWithThisPiece(Piece, N, BoardSize, BoardShape, BoardHole, BoardColor):-
 % IA pour le choix d'une piece pour l'adversaire
 iaChoosePiece(Piece,RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor) :-
   length(RemainingPieces, NumberPieces),
-  %0 =< N =<NumberPieces,
-  write("bang"),
-  nth0(N, RemainingPieces, Piece),
-  write("bong"),
+  nth0(_, RemainingPieces, Piece),
   \+winWithThisPiece(Piece, 16, BoardSize, BoardShape, BoardHole, BoardColor),
-  !,
   supprime(Piece,RemainingPieces, NewRemainingPieces),
   retract(remainingPieces(RemainingPieces)),
-  assert(remainingPieces(NewRemainingPieces)).
+  assert(remainingPieces(NewRemainingPieces)),
+  write("Il reste "),write(NumberPieces),writeln(" pieces a jouer.").
 
 % If we can only loose, we pick a random Piece
 iaChoosePiece(Piece,RemainingPieces,_,_,_,_):-
+  writeln("Le prochain coup sera le coup gagnant."),
   length(RemainingPieces, NumberPieces),
   random(1, NumberPieces, IndexPiece),
   % pick a piece
