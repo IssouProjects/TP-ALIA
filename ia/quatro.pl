@@ -24,7 +24,7 @@ play(Player):-
     boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
     displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), % print it
     write(Player), writeln(' choose a piece for your opponent:'),
-    iaChoosePiece(Piece, RemainingPieces), % ask the AI to choose a piece for the opponnent
+    iaChoosePiece(Piece, RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor), % ask the AI to choose a piece for the opponnent
     changePlayer(Player, NextPlayer), % change to the player that will place the spiece
     write(NextPlayer), writeln( ' play the piece:'),
     iaChooseMove(BoardSize, Move),
