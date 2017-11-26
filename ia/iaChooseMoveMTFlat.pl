@@ -7,55 +7,77 @@
 :- dynamic boardHoleSS/1.
 :- dynamic remainingPiecesSS/1.
 
-iaChooseMoveMTFlat(Piece, Move, Win).
+% major saved state
+:- dynamic boardSizeSS2/1.
+:- dynamic boardShapeSS2/1.
+:- dynamic boardColorSS2/1.
+:- dynamic boardHoleSS2/1.
+:- dynamic remainingPiecesSS2/1.
 
-iaChooseMoveMTFlat(Piece, Move, Player) :- length(MoveGrades, 16), runTests(MoveGrades, Piece, Player)
+iaChooseMoveMTFlat(Piece, Move, Player) :- length(MoveGrades, 16), runTests(MoveGrades, Piece, Player), findOptimal(MoveGrades, Move).
 
-runTests(MoveGrades, Piece, Player):- 
-  between(0,15,I),
-  testMove(MoveGrades, I, Piece),
+findOptimal(MoveGrades, Move) :- findOptimal(MoveGrades, 0, 0, Move, -1).
+findOptimal([], FinalMove, _, FinalMove, _).
+findOptimal([X|MoveGrades], _, Max, FinalMove, I):-
+    N is I+1,
+    nonvar(X),
+    X > Max,
+    findOptimal(MoveGrades, N, X, FinalMove, N).
+findOptimal([_|MoveGrades], Move, Max, FinalMove, I):-
+    N is I+1,
+    findOptimal(MoveGrades, Move, Max, FinalMove, N).
 
-testMoves(MoveGrades, Move, Piece, Player):- 
+
+runTests(MoveGrades, Piece, Player):- runTests(MoveGrades, Piece, Player, 0).
+runTests(MoveGrades, Piece, Player, 16).
+runTests(MoveGrades, Piece, Player, I):- 
+  N is I+1,
+  saveStates2(),
+  write("TESTING CASE: "),
+  writeln(I),
+  testMovesMCF(MoveGrades, I, Piece, Player),
+  writeln("FINISHED: "),
+  writeln(I),
+  restoreStates2(),
+  runTests(MoveGrades, Piece, Player, N).
+
+
+testMovesMCF(MoveGrades, Move, Piece, Player):- 
   nth0(Move, BoardSize, Elem), var(Elem), % check if empty case
   playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
   applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
-  testMove(Move, Piece, Player, 0, _, 0, _, X),
-  nth0(Move, MoveGrades, X),
-  writeln(X).
+  testMoveMCF(Move, Piece, Player, X),
+  nth0(Move, MoveGrades, X).
+  
 
-testMove(Move, Piece, Player, 100, newI, OldCount, NewCount, FinalCount) FinalCount is OldCount.
-testMove(Move, Piece, Player, I, NewI, OldCount, NewCount) :-
+testMoveMCF(Move, Piece, Player, FinalCount):- testMoveMCF(Move, Piece, Player, 0, 0, FinalCount), !.
+testMoveMCF(_, _, _, 100, FinalCount, FinalCount):- writeln("100 DONE"), !.
+testMoveMCF(Move, Piece, Player, I, Count, FinalCount) :-
   NewI is I+1,
   saveStates(),
   CurrentPlayer = Player,
   randomEndGame(CurrentPlayer, DidWeWin, Player),
-  NewCount is OldCount + DidWeWin,
+  NewCount is Count + DidWeWin,
   restoreStates(),
-  testMove(Move, Piece, Player, NewI, _, NewCount, _).
+  
+  testMoveMCF(Move, Piece, Player, NewI, NewCount, FinalCount).
 
-
-Increment(Move, MoveGrades, DidWeWin):-
-  nth0(Move, MoveGrades, X),
-  var(X),
-  X is 0,
-  Increment(Move, MoveGrades, DidWeWin).
-
-Increment(Move, MoveGrades, DidWeWin):-
-  nth0(Move, MoveGrades, X)
-
-randomEndGame(Player, 1, OriginalPlayer):- gameoverMTFlat(), Player is OriginalPlayer.  
-randomEndGame(Player, 0, OriginalPlayer):- gameoverMTFlat(), not(Player is OriginalPlayer).  
+randomEndGame(Player, 1, OriginalPlayer):- Player is OriginalPlayer, gameoverMTFlat().
+randomEndGame(Player, 0, OriginalPlayer):- not(Player is OriginalPlayer),gameoverMTFlat(). 
 randomEndGame(Player, DidWeWin, OriginalPlayer) :-
+    writeln("randomEndGame"),
     boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
+    displayBoard(BoardSize, BoardShape, BoardHole, BoardColor),
     iaChoosePiece(Piece, RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor), % ask the AI to choose a piece for the opponnent
     changePlayer(Player, NextPlayer), % change to the player that will place the spiece
-    iaChooseMove(Piece, Move),
+    iaChooseMove(BoardSize, Move),
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
     applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one
-    randomEndGame(NextPlayer, DidWeWin). % next turn!
+    
+    randomEndGame(NextPlayer, DidWeWin, OriginalPlayer). % next turn!
                                     
 gameoverMTFlat() :- 
-  boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces), 
+  boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), 
   win(BoardSize,BoardHole,BoardColor,BoardShape), !.
 gameoverMTFlat() :- boardShape(BoardShape), isBoardFull(BoardShape).
 
@@ -76,18 +98,42 @@ saveStates() :-
 restoreStates() :-
   boardSizeSS(BoardSizeSS), boardShapeSS(BoardShapeSS), boardHoleSS(BoardHoleSS), boardColorSS(BoardColorSS), remainingPiecesSS(RemainingPiecesSS),
   boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
-  BoardSize = BoardSizeSS,
-  BoardShape = BoardShapeSS,
-  BoardHole = BoardHoleSS,
-  BoardColor = BoardColorSS,
-  RemainingPieces = RemainingPiecesSS,
+  retract(boardSize(BoardSize)), assert(boardSize(BoardSizeSS)), % Remove the old board from the KB and store the new one
+  retract(boardShape(BoardShape)), assert(boardShape(BoardShapeSS)), % Remove the old board from the KB and store the new one
+  retract(boardHole(BoardHole)), assert(boardHole(BoardHoleSS)), % Remove the old board from the KB and store the new one
+  retract(boardColor(BoardColor)), assert(boardColor(BoardColorSS)),
+  retract(remainingPieces(RemainingPieces)), assert(remainingPieces(RemainingPiecesSS)),
   retract(boardSizeSS(BoardSizeSS)),
   retract(boardShapeSS(BoardShapeSS)),
   retract(boardColorSS(BoardHoleSS)),
   retract(boardHoleSS(BoardColorSS)),
-  retract(remainingPiecesSS(RemainingPiecesSS)),
-  retract(boardSize(BoardSize)), assert(boardSize(NewBoardSize)), % Remove the old board from the KB and store the new one
-  retract(boardShape(BoardShape)), assert(boardShape(NewBoardShape)), % Remove the old board from the KB and store the new one
-  retract(boardHole(BoardHole)), assert(boardHole(NewBoardHole)), % Remove the old board from the KB and store the new one
-  retract(boardColor(BoardColor)), assert(boardColor(NewBoardColor)).
+  retract(remainingPiecesSS(RemainingPiecesSS)).
+
+saveStates2() :-
+  boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
+  BoardSizeSS = BoardSize,
+  BoardShapeSS = BoardShape,
+  BoardHoleSS = BoardHole,
+  BoardColorSS = BoardColor,
+  RemainingPiecesSS = RemainingPieces,
+  assert(boardSizeSS2(BoardSizeSS)),
+  assert(boardShapeSS2(BoardShapeSS)),
+  assert(boardColorSS2(BoardHoleSS)),
+  assert(boardHoleSS2(BoardColorSS)),
+  assert(remainingPiecesSS2(RemainingPiecesSS)).
+
+
+restoreStates2() :-
+  boardSizeSS2(BoardSizeSS), boardShapeSS2(BoardShapeSS), boardHoleSS2(BoardHoleSS), boardColorSS2(BoardColorSS), remainingPiecesSS2(RemainingPiecesSS),
+  boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
+  retract(boardSize(BoardSize)), assert(boardSize(BoardSizeSS)), % Remove the old board from the KB and store the new one
+  retract(boardShape(BoardShape)), assert(boardShape(BoardShapeSS)), % Remove the old board from the KB and store the new one
+  retract(boardHole(BoardHole)), assert(boardHole(BoardHoleSS)), % Remove the old board from the KB and store the new one
+  retract(boardColor(BoardColor)), assert(boardColor(BoardColorSS)),
+  retract(remainingPieces(RemainingPieces)), assert(remainingPieces(RemainingPiecesSS)),
+  retract(boardSizeSS2(BoardSizeSS)),
+  retract(boardShapeSS2(BoardShapeSS)),
+  retract(boardColorSS2(BoardHoleSS)),
+  retract(boardHoleSS2(BoardColorSS)),
+  retract(remainingPiecesSS2(RemainingPiecesSS)).
 

@@ -11,6 +11,7 @@
 :- consult(end).
 :- consult(player).
 :- consult(util).
+:- consult(iaChooseMoveMTFlat).
 
 :- dynamic boardSize/1.
 :- dynamic boardShape/1.
@@ -30,7 +31,7 @@ play(Player):-
     changePlayer(Player, NextPlayer), % change to the player that will place the spiece
     write(NextPlayer), writeln( ' play the piece:'),
     %iaChooseMove(BoardSize, Move),
-    iaChooseMove2(Piece, Move),
+    iaChooseMoveMTFlat(Piece, Move, Player),
     write(NextPlayer), write( ' played the piece:'), write(Piece), write(' in '), writeln(Move),
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
     applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one

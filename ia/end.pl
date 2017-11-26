@@ -32,5 +32,5 @@ win(BoardSize,BoardHole,BoardColor,BoardShape):-
   winBoard(Board) :- Board = [P,_,_,_,_,Q,_,_,_,_,R,_,_,_,_,S], P==Q, Q==R, R==S, nonvar(P). % first diagonal
   winBoard(Board) :- Board = [_,_,_,P,_,_,Q,_,_,R,_,_,S,_,_,_], P==Q, Q==R, R==S, nonvar(P). % second diagonal
 
-isBoardFull([]).
+isBoardFull([]):- writeln("zefzef").
 isBoardFull([H|T]):- nonvar(H), isBoardFull(T).
