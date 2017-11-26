@@ -19,7 +19,7 @@
 
 :- dynamic remainingPieces/1.
 
-reset():- retract(boardSize(_)), retract(boardColor(_)), retract(boardShape(_)), retract(boardHole(_)), retract(remainingPieces(_)).
+reset():- halt, retract(boardSize(_)), retract(boardColor(_)), retract(boardShape(_)), retract(boardHole(_)), retract(remainingPieces(_)).
 %TODO Le cas ou le board est plein et il n'y a pas de gagnant n'est pas pris en compte.
 play(Player):- gameover(), write('Game is Over. Winner: '), writeln(Player),boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), reset().
 
