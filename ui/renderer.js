@@ -1,5 +1,12 @@
 const prolog = require('./prolog');
 
+const swipl = require('swipl');
+swipl.call('consult(ia/quatro)');
+const { list, compound, variable, serialize } = swipl.term;
+
+
+
+
 var winner0 = 0
 var winner1 = 0
 
@@ -30,6 +37,35 @@ function play(games) {
   })
 }
 
+/*function playProlog(){
+  const ret = swipl.call('play(X).');
+}*/
+
+function test(){
+  swipl.call('init.')
+
+  var res;
+
+  res = swipl.call('play(0,Piece,Move).')
+  console.log(res.Piece)
+  console.log(res.Move)
+
+  const escaped = serialize(
+    compound('member', [
+        0,
+        list([1, 2, 3, 4])]));
+ 
+ console.log(swipl.call(escaped));
+  
+  
+
+  res2 = swipl.call('play(0,Piece,Move).')
+  console.log(res2.Piece)
+  console.log(res2.Move)
+  
+
+}
+
 function done() {
   document.getElementById("start").disabled = false
   document.getElementById("stop").disabled = true
@@ -40,7 +76,8 @@ document.getElementById("start").addEventListener("click", function () {
   winner1 = 0
   document.getElementById("start").disabled = true
   document.getElementById("stop").disabled = false
-  play(100)
+  test();
+  //play(100)
 })
 
 document.getElementById("stop").addEventListener("click", function () {

@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/IssouProjects/TP-ALIA#readme",
   "dependencies": {
-    "electron": "^1.8.1"
+    "electron": "^1.8.1",
+    "swipl": "^1.0.3"
   },
   "devDependencies": {
     "electron-rebuild": "^1.6.0"

@@ -6,7 +6,7 @@
 
 
 iaChooseMove2(Piece, Move) :-testMoves(Piece, Move).
-iaChooseMove2(_, Move) :- writeln('Play a random move.'), repeat, Index is random(16), boardSize(BoardSize), nth0(Index, BoardSize, Elem), var(Elem), Move is Index.
+iaChooseMove2(_, Move) :- repeat, Index is random(16), boardSize(BoardSize), nth0(Index, BoardSize, Elem), var(Elem), Move is Index.
 
 
 testMoves(Piece,Move) :-
