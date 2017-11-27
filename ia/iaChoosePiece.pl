@@ -13,7 +13,7 @@ iaChoosePiece(Piece,RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColo
   supprime(Piece,RemainingPieces, NewRemainingPieces),
   retract(remainingPieces(RemainingPieces)),
   assert(remainingPieces(NewRemainingPieces)),
-  write("Il reste "),write(NumberPieces),writeln(" pieces a jouer.").
+  write("Il reste "),write(NumberPieces),writeln(" pieces a jouer."), !.
 
 % If we can only loose, we pick a random Piece
 iaChoosePiece(Piece,RemainingPieces,_,_,_,_):-
