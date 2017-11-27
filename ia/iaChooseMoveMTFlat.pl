@@ -24,6 +24,9 @@ findOptimal([], FinalMove, _, FinalMove, _).
 findOptimal([X|MoveGrades], _, Max, FinalMove, I):-
     N is I+1,
     nonvar(X),
+    write(N),
+    write(" - "),
+    writeln(X),
     X > Max,
     findOptimal(MoveGrades, N, X, FinalMove, N).
 findOptimal([_|MoveGrades], Move, Max, FinalMove, I):-
@@ -78,7 +81,8 @@ randomEndGame(Player, DidWeWin, OriginalPlayer) :-
     applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one
     randomEndGame(NextPlayer, DidWeWin, OriginalPlayer). % next turn!
                                     
-gameoverMTFlat :- win().
+gameoverMTFlat :- boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), 
+  win(BoardSize,BoardHole,BoardColor,BoardShape).
 gameoverMTFlat :- boardShape(BoardShape),isBoardFull(BoardShape).
 
 saveStates :-
