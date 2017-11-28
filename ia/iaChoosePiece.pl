@@ -7,7 +7,6 @@ winWithThisPiece(Piece, BoardSize, BoardShape, BoardHole, BoardColor):-
 
 % IA pour le choix d'une piece pour l'adversaire
 iaChoosePiece(Piece,RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor) :-
-  length(RemainingPieces, NumberPieces),
   nth0(_, RemainingPieces, Piece),
   \+winWithThisPiece(Piece, BoardSize, BoardShape, BoardHole, BoardColor),
   supprime(Piece,RemainingPieces, NewRemainingPieces),

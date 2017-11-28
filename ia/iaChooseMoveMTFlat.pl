@@ -54,7 +54,7 @@ runTests(MoveGrades, Piece, Player, I):-
 %
 % Algo : play a Move and run random games on the updated board, save the number of victories in MoveGrades
 testMovesMCF(MoveGrades, Move, _, _):- 
-  boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor),
+  boardSize(BoardSize), 
   nth0(Move, BoardSize, Elem), nonvar(Elem), % check if empty case
   nth0(Move, MoveGrades, 0).
 
