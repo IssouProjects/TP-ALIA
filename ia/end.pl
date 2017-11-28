@@ -3,7 +3,7 @@
 %
 
 gameover() :- win(), !.
-gameover() :- boardShape(BoardShape), isBoardFull(BoardShape).
+gameover() :- boardShape(BoardShape), isBoardFull(BoardShape), write("Board full").
 
 % Check if the game is won
 win():- boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor),

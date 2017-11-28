@@ -7,15 +7,11 @@ winWithThisPiece(Piece, BoardSize, BoardShape, BoardHole, BoardColor):-
 
 % IA pour le choix d'une piece pour l'adversaire
 iaChoosePiece(Piece,RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor) :-
-  length(RemainingPieces, NumberPieces),
   nth0(_, RemainingPieces, Piece),
   \+winWithThisPiece(Piece, BoardSize, BoardShape, BoardHole, BoardColor),
   supprime(Piece,RemainingPieces, NewRemainingPieces),
   retract(remainingPieces(RemainingPieces)),
-  assert(remainingPieces(NewRemainingPieces)),
-  write("Il reste "),write(NumberPieces),writeln(" pieces a jouer.").
+  assert(remainingPieces(NewRemainingPieces)), !.
 
 % If we can only loose, we pick a random Piece
-iaChoosePiece(Piece,RemainingPieces,_,_,_,_):-
-  writeln("Le prochain coup sera le coup gagnant."),
-  chooseRandomPiece(Piece, RemainingPieces).
+iaChoosePiece(Piece,RemainingPieces,_,_,_,_):- chooseRandomPiece(Piece, RemainingPieces).
