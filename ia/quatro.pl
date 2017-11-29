@@ -12,6 +12,7 @@
 :- consult(player).
 :- consult(util).
 :- consult(iaChooseMoveMTFlat).
+:- consult(minimax).
 
 :- dynamic boardSize/1.
 :- dynamic boardShape/1.
