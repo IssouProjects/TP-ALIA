@@ -16,27 +16,30 @@
 
 :- module(minimax, [minimax/3]).
 
+iaChooseMoveMinimax(LastPiece, LastMove, SelectedPiece, BestMove, Depth):- minimax(LastPiece, LastMove, SelectedPiece, BestMove, Depth, _).
 
-
-% minimax(Pos, BestNextPos, Val)
-% Pos is a position, Val is its minimax value.
-% Best move from Pos leads to position BestNextPos.
-minimax(Pos, BestNextPos, Val) :-
+% minimax(LastPiece, LastMove, SelectedPiece, BestMove, Depth, Val)
+% LastPiece is the last Piece used on the board
+% LastMove is the last move played on the board
+% SelectedPiece is the piece to during the turn
+% BestMove is the BestMove to play the piece
+% Val is the minimax value of LastPiece + LastMove
+minimax([LastPiece, LastMove, SelectedPiece], BestMove, Depth, Val) :-
     % Legal moves in Pos produce NextPosList
-    bagof(NextPos, move(Pos, NextPos), NextPosList),
-    best(NextPosList, BestNextPos, Val), !
+    bagof([NextPiece, NextMove], move([LastPiece, LastMove, SelectedPiece], [NextPiece, NextMove]), NextPosList),
+    best(NextPosList, BestMove, Val), !
     ;
     evalAllBoard(Boards, Val).     % Pos has no successors -> evaluate the positition
 
 
 
-best([Pos], Pos, Val) :-
-    minimax(Pos, _, Val), !.
+best([[LastPiece, LastMove, SelectedPiece]], [LastPiece, LastMove, SelectedPiece], Val) :-
+    minimax([LastPiece, LastMove, SelectedPiece], _, Val), !.
 
-best([Pos1 | PosList], BestPos, BestVal) :-
-    minimax(Pos1, _, Val1),
-    best(PosList, Pos2, Val2),
-    betterOf(Pos1, Val1, Pos2, Val2, BestPos, BestVal).
+best([[LastPiece1, LastMove1, SelectedPiece1] | PosList], BestMove, BestVal) :-
+    minimax([LastPiece1, LastMove1, SelectedPiece1], _, Val1),
+    best(PosList, [LastPiece2, LastMove2, SelectedPiece2], Val2),
+    betterOf([LastPiece1, LastMove1, SelectedPiece1], Val1, [LastPiece1, LastMove1, SelectedPiece1], Val2, BestMove, BestVal).
 
 
 
