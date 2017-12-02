@@ -18,12 +18,12 @@ best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, [[Move
 	supprime(NextPiece, RemainingPieces, NewRemainingPieces),
   minimax(NewBoardSize, NewBoardShape, NewBoardColor, NewBoardHole, NewRemainingPieces, NextPiece,  _, Eval, Depth), !.
 
-best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, [[Move|[NextPiece]|Moves], BestMove, BestEval, Depth) :-
+best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, [[Move|[NextPiece]]|Moves], BestMove, BestEval, Depth) :-
   playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
 	supprime(NextPiece, RemainingPieces, NewRemainingPieces),
   minimax(NewBoardSize, NewBoardShape, NewBoardColor, NewBoardHole,NewRemainingPieces, NextPiece, _, Eval, Depth),
   best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, NextPiece, Moves, BestMove1, BestEval1, Depth),
-  better_of(Move1, Eval, BestMove1, BestEval1, BestMove, BestEval, Depth).
+  better_of([Move|[NextPiece]], Eval, BestMove1, BestEval1, BestMove, BestEval, Depth).
 
 % HELP MEEEEEEE
 list_available_moves(BoardSize, FinalListMoves, RemainingPieces):- list_available_moves(BoardSize, [], RemainingPieces, FinalListMoves, 0).
