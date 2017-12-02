@@ -13,17 +13,17 @@ minimax(BoardShape, BoardSize, BoardColor, BoardHole,_ ,_ , _, Eval, _) :-
   evalAllBoard(BoardSize, BoardShape, BoardHole, BoardColor, Eval),
 	displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), writeln(Eval),!.
 
-best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, [[Move|[NextPiece]]], [Move|[NextPiece]], Eval, Depth) :-
-	playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
-	supprime(NextPiece, RemainingPieces, NewRemainingPieces),
-  minimax(NewBoardSize, NewBoardShape, NewBoardColor, NewBoardHole,NewRemainingPieces, NextPiece, _, Eval, Depth), !.
-
-best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, [[Move|[NextPiece]]|Moves], BestMove, BestEval, Depth) :-
-  dechain(Move, Move1),
+best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, [Move], Move, Eval, Depth) :-
   playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
-	supprime(NextPiece, RemainingPieces, NewRemainingPieces),
-  minimax(NewBoardSize, NewBoardShape, NewBoardColor, NewBoardHole,NewRemainingPieces, NextPiece, _, Eval, Depth),
-  best(BoardShape, BoardSize, BoardColor, BoardHole,NewRemainingPieces, NextPiece, Moves, BestMove1, BestEval1, Depth),
+	supprime(RemainingPieces, Piece, NewRemainingPieces),
+  minimax(NewBoardSize, NewBoardShape, NewBoardColor, NewBoardHole, NewRemainingPieces, Piece,  _, Eval, Depth), !.
+
+best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, [[Move|Tmp]|Moves], BestMove, BestEval, Depth) :-
+  dechain(Move, Move1),
+	supprime(RemainingPieces, Piece, NewRemainingPieces),
+  playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
+  minimax(NewBoardSize, NewBoardShape, NewBoardColor, NewBoardHole,RemainingPieces, NextPiece, _, Eval, Depth),
+  best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, NextPiece, Moves, BestMove1, BestEval1, Depth),
   better_of(Move1, Eval, BestMove1, BestEval1, BestMove, BestEval, Depth).
 
 % HELP MEEEEEEE
