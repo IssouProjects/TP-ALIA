@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/IssouProjects/TP-ALIA#readme",
   "dependencies": {
+    "bootstrap": "^3.3.7",
     "electron": "^1.8.1"
   },
   "devDependencies": {
