@@ -16,13 +16,13 @@ minimax(BoardShape, BoardSize, BoardColor, BoardHole,_ , _, Eval, _) :-
 
 best(BoardShape, BoardSize, BoardColor, BoardHole, Piece, [Move], Move, Eval, Depth) :-
   playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
-  minimax(Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, _, Eval, Depth), !.
+  minimax(NewBoardSize, NewBoardShape, NewBoardColor, NewBoardHole ,Piece,  _, Eval, Depth), !.
 
 best(BoardShape, BoardSize, BoardColor, BoardHole, Piece, [Move|Moves], BestMove, BestEval, Depth) :-
   dechain(Move, Move1),
   playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
   minimax(Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor, _, Eval, Depth),
-  best(Piece, Moves, BestMove1, BestEval1, Depth),
+  best(BoardShape, BoardSize, BoardColor, BoardHole, Piece, Moves, BestMove1, BestEval1, Depth),
   better_of(Piece, Move1, Eval, BestMove1, BestEval1, BestMove, BestEval, Depth).
 
 list_available_moves(BoardSize, FinalListMoves):- list_available_moves(BoardSize, [],FinalListMoves, 0).
