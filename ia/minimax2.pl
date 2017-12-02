@@ -11,7 +11,8 @@ minimax(BoardShape, BoardSize, BoardColor, BoardHole, Piece, NextMove, Eval, Dep
 	best(BoardShape, BoardSize, BoardColor, BoardHole, Piece, ListMoves, NextMove, Eval, NewDepth), !.
 
 minimax(BoardShape, BoardSize, BoardColor, BoardHole,_ , _, Eval, _) :-
-  evalAllBoard(BoardSize, BoardShape, BoardHole, BoardColor, Eval), !.
+  evalAllBoard(BoardSize, BoardShape, BoardHole, BoardColor, Eval),
+	displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), writeln(Eval),!.
 
 best(BoardShape, BoardSize, BoardColor, BoardHole, Piece, [Move], Move, Eval, Depth) :-
   playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
@@ -29,7 +30,7 @@ list_available_moves(_,FinalListMoves, FinalListMoves, 16).
 list_available_moves(BoardSize, ListMoves, FinalListMoves, I):-
 	N is I+1,
 	nth0(I, BoardSize, Elem), var(Elem),
-	append(ListMoves,I,NewListMoves),
+	append(ListMoves,[I],NewListMoves),
 	list_available_moves(BoardSize, NewListMoves, FinalListMoves, N).
 
 list_available_moves(BoardSize, ListMoves,FinalListMoves, I):-
