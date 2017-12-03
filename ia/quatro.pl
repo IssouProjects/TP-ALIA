@@ -33,7 +33,7 @@ play(0):-
     displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), % print it
     iaChoosePiece(Piece, RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor), % ask the AI to choose a piece for the opponnent
     write(0), write(' choosed a piece for its opponent:'), writeln(Piece),
-    iaChooseMove(BoardSize, Move),
+    iaChooseMove2(BoardSize, Move),
     %iaChooseMove2(Piece, Move),
     write(1), write( ' played the piece like a cuck:'), write(Piece), write(' in '), writeln(Move),
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
