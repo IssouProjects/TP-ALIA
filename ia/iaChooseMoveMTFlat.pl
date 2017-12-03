@@ -14,8 +14,8 @@
 :- dynamic boardHoleSS2/1.
 :- dynamic remainingPiecesSS2/1.
 
-% findOptimal(Piece, Move, Player) : Move is the optimal move for the Piece, if we want Player to win
-iaChooseMoveMTFlat(Piece, Move, Player) :- 
+% iaChooseMoveMCFlat(Piece, Move, Player) : Move is the optimal move for the Piece, if we want Player to win
+iaChooseMoveMCFlat(Piece, Move, Player) :-
   length(MoveGrades, 16),              % We store here the number of victories for each Move
   runTests(MoveGrades, Piece, Player),
   findOptimal(MoveGrades, Move), !.    % We select the most victorious move
@@ -43,7 +43,7 @@ findOptimal([_|MoveGrades], Move, Max, FinalMove, I):-
 % Algo : runs all tests for the 16 moves
 runTests(MoveGrades, Piece, Player):- runTests(MoveGrades, Piece, Player, 0).
 runTests(_, _, _, 16).
-runTests(MoveGrades, Piece, Player, I):- 
+runTests(MoveGrades, Piece, Player, I):-
   N is I+1,
   saveStates2,
   testMovesMCF(MoveGrades, I, Piece, Player),
@@ -53,20 +53,20 @@ runTests(MoveGrades, Piece, Player, I):-
 % testMovesMCF(MoveGrades, Move, Piece, Player) : MoveGrades contains the number of Player victories for each possible move (0 to 16)
 %
 % Algo : play a Move and run random games on the updated board, save the number of victories in MoveGrades
-testMovesMCF(MoveGrades, Move, _, _):- 
-  boardSize(BoardSize), 
+testMovesMCF(MoveGrades, Move, _, _):-
+  boardSize(BoardSize),
   nth0(Move, BoardSize, Elem), nonvar(Elem), % check if empty case
   nth0(Move, MoveGrades, 0).
 
-testMovesMCF(MoveGrades, Move, Piece, Player):- 
+testMovesMCF(MoveGrades, Move, Piece, Player):-
   boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor),
   nth0(Move, BoardSize, Elem), var(Elem), % check if empty case
   playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
   applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
   testMoveMCF(Move, Piece, Player, X),
   nth0(Move, MoveGrades, X).
-  
-% testMoveMCF(Move, Piece, Player, Count) : Count containts the number of victories out of the 10 randoms games played
+
+% testMoveMCF(Move, Piece, Player, Count) : Count contains the number of victories out of the 10 randoms games played
 %
 % Algo : run random games on the board and keep track of the number of victories.
 testMoveMCF(Move, Piece, Player, Count):- testMoveMCF(Move, Piece, Player, 0, 0, Count), !.
@@ -80,11 +80,11 @@ testMoveMCF(Move, Piece, Player, I, Count, FinalCount) :-
   restoreStates,
   testMoveMCF(Move, Piece, Player, NewI, NewCount, FinalCount).
 
-% randomEndGame(Player, DidWeWin, OriginalPlayer) : finish a game and tells us the winner. DidWeWin = 1 if OriginalPlayer won, 
+% randomEndGame(Player, DidWeWin, OriginalPlayer) : finish a game and tells us the winner. DidWeWin = 1 if OriginalPlayer won,
 %                                                   DidWeWin = 0 if OriginalPlayer loses.
 % Algo : each player plays, one after another, till the game ends.
 randomEndGame(Player, 1, OriginalPlayer):- Player is OriginalPlayer, gameoverMTFlat, !.
-randomEndGame(Player, 0, OriginalPlayer):- not(Player is OriginalPlayer), gameoverMTFlat, !. 
+randomEndGame(Player, 0, OriginalPlayer):- not(Player is OriginalPlayer), gameoverMTFlat, !.
 randomEndGame(Player, DidWeWin, OriginalPlayer) :-
     boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
     %displayBoard(BoardSize, BoardShape, BoardHole, BoardColor),
@@ -97,10 +97,10 @@ randomEndGame(Player, DidWeWin, OriginalPlayer) :-
 
 % gameoverMTFlat : is true if the game is over
 %
-% Algo : check if one player won the game or if the board is full                             
-gameoverMTFlat :- boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), 
+% Algo : check if one player won the game or if the board is full
+gameoverMCFlat :- boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor),
   win(BoardSize,BoardHole,BoardColor,BoardShape).
-gameoverMTFlat :- boardShape(BoardShape),isBoardFull(BoardShape).
+gameoverMCFlat :- boardShape(BoardShape),isBoardFull(BoardShape).
 
 % saveStates : saves the state of the Board
 %
@@ -160,7 +160,7 @@ restoreStates2 :-
   retract(boardSize(BoardSize)),              assert(boardSize(BoardSizeSS2)), % Remove the old board from the KB and store the new one
   retract(boardShape(BoardShape)),            assert(boardShape(BoardShapeSS2)), % Remove the old board from the KB and store the new one
   retract(boardHole(BoardHole)),              assert(boardHole(BoardHoleSS2)), % Remove the old board from the KB and store the new one
-  retract(boardColor(BoardColor)),            assert(boardColor(BoardColorSS2)),           
+  retract(boardColor(BoardColor)),            assert(boardColor(BoardColorSS2)),
   retract(remainingPieces(RemainingPieces)),  assert(remainingPieces(RemainingPiecesSS2)),
   retract(boardSizeSS2(BoardSizeSS2)),
   retract(boardShapeSS2(BoardShapeSS2)),
