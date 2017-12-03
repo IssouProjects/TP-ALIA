@@ -4,7 +4,7 @@ iaChooseMoveMinimax(SelectedPiece, BestMove, Depth):-
  	minimax(BoardShape, BoardSize, BoardColor, BoardHole, RemainingPieces, SelectedPiece, BestMove, _, Depth).
 
 minimax(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, NextMove, Eval, Depth) :-
-	Depth < 5,
+	Depth < 2,
 	NewDepth is Depth + 1,
 	list_available_moves(BoardSize, ListMoves, RemainingPieces),
 	best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, ListMoves, NextMove, Eval, NewDepth), !.
@@ -14,16 +14,16 @@ minimax(BoardShape, BoardSize, BoardColor, BoardHole,_ ,_ , _, Eval, _) :-
 	displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), writeln(Eval),!.
 
 best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, [[Move|[NextPiece]]], [Move|[NextPiece]], Eval, Depth) :-
-  playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
+  playMove2(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
 	supprime(NextPiece, RemainingPieces, NewRemainingPieces),
   minimax(NewBoardSize, NewBoardShape, NewBoardColor, NewBoardHole, NewRemainingPieces, NextPiece,  _, Eval, Depth), !.
 
 best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, [[Move|[NextPiece]]|Moves], BestMove, BestEval, Depth) :-
-  playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
+  playMove2(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
 	supprime(NextPiece, RemainingPieces, NewRemainingPieces),
-  minimax(NewBoardSize, NewBoardShape, NewBoardColor, NewBoardHole,NewRemainingPieces, NextPiece, _, Eval, Depth),
-  best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, NextPiece, Moves, BestMove1, BestEval1, Depth),
-  better_of([Move|[NextPiece]], Eval, BestMove1, BestEval1, BestMove, BestEval, Depth).
+  minimax(NewBoardShape, NewBoardSize, NewBoardColor, NewBoardHole, NewRemainingPieces, NextPiece, _, Eval, Depth),
+  best(BoardShape, BoardSize, BoardColor, BoardHole, RemainingPieces, Piece, Moves, BestMove1, BestEval1, Depth),
+  better_of(Move, Eval, BestMove1, BestEval1, BestMove, BestEval, Depth).
 
 % HELP MEEEEEEE
 list_available_moves(BoardSize, FinalListMoves, RemainingPieces):- list_available_moves(BoardSize, [], RemainingPieces, FinalListMoves, 0).
@@ -38,19 +38,40 @@ list_available_moves(BoardSize, ListMoves,RemainingPieces,FinalListMoves, I):-
 	N is I+1,
 	nth0(I, BoardSize, Elem), nonvar(Elem),
 	list_available_moves(BoardSize, ListMoves,RemainingPieces,FinalListMoves, N).
-
+% EST
 appendAllPieces(_, [], ListMovesComplete, ListMovesComplete).
 appendAllPieces(I, [Piece|RemainingPieces], ListMoves, ListMovesComplete):-
 	append(ListMoves,[[I, Piece]],NewListMoves),
 	appendAllPieces(I, RemainingPieces, NewListMoves, ListMovesComplete).
 
 
+copyBoard(Board, NewBoard):-
+	between(0,15,I),
+	nth0(I, Board, X),
+	nonvar(X),
+	nth0(I, NewBoard, X).
+
+playMoveBoard2(Board,Move,Piece,NewBoard) :- copyBoard(Board,NewBoard), nth0(Move,NewBoard,Piece).
+
+playMove2(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor) :-
+	nth0(Move, BoardSize, X),
+	var(X),
+  nth0(0, Piece, Size),
+  nth0(1, Piece, Shape),
+  nth0(2, Piece, Color),
+  nth0(3, Piece, Hole),
+  playMoveBoard2(BoardSize,Move,Size,NewBoardSize), % Play the move and get the result in a new Board
+  playMoveBoard2(BoardShape,Move,Shape,NewBoardShape), % Play the move and get the result in a new Board
+  playMoveBoard2(BoardHole,Move,Hole,NewBoardHole), % Play the move and get the result in a new Board
+  playMoveBoard2(BoardColor,Move,Color,NewBoardColor). % Play the move and get the result in a new Board
 
 dechain([Move],Move).
 dechain([_|Moves],Last) :- last(Moves, Last).
 dechain(Move, Move).
 
 even(Val):- 0 is mod(Val,2).
+
+% better_of(Move1, Eval1, Move2, Eval2, BestMoveDesDeux, BestEvalDesDeux, Depth)
 
 better_of(Move1, Eval1, _, Eval2, Move1, Eval1, Depth) :-
 	even(Depth),
