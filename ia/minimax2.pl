@@ -10,8 +10,7 @@ minimax(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, Nex
 	best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, ListMoves, NextMove, Eval, NewDepth), !.
 
 minimax(BoardShape, BoardSize, BoardColor, BoardHole,_ ,_ , _, Eval, _) :-
-  evalAllBoard(BoardSize, BoardShape, BoardHole, BoardColor, Eval),
-	displayBoard(BoardSize, BoardShape, BoardHole, BoardColor), writeln(Eval),!.
+  evalAllBoard(BoardSize, BoardShape, BoardHole, BoardColor, Eval),!.
 
 best(BoardShape, BoardSize, BoardColor, BoardHole,RemainingPieces, Piece, [[Move|[NextPiece]]], [Move|[NextPiece]], Eval, Depth) :-
   playMove2(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),
@@ -44,14 +43,7 @@ appendAllPieces(I, [Piece|RemainingPieces], ListMoves, ListMovesComplete):-
 	append(ListMoves,[[I, Piece]],NewListMoves),
 	appendAllPieces(I, RemainingPieces, NewListMoves, ListMovesComplete).
 
-
-copyBoard(Board, NewBoard):-
-	between(0,15,I),
-	nth0(I, Board, X),
-	nonvar(X),
-	nth0(I, NewBoard, X).
-
-playMoveBoard2(Board,Move,Piece,NewBoard) :- copyBoard(Board,NewBoard), nth0(Move,NewBoard,Piece).
+playMoveBoard2(Board,Move,Piece,NewBoard) :- duplicate_term(Board,NewBoard), nth0(Move,NewBoard,Piece).
 
 playMove2(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor) :-
 	nth0(Move, BoardSize, X),
@@ -81,8 +73,8 @@ better_of(_, Eval1, Move2, Eval2, Move2, Eval2, Depth) :-
 	Eval2 >= Eval1, !.
 
 better_of(Move1, Eval1, _, Eval2, Move1, Eval1, Depth) :-
-	even(Depth),
+	not(even(Depth)),
 	Eval1 =< Eval2, !.
 better_of(_, Eval1, Move2, Eval2, Move2, Eval2, Depth) :-
-	even(Depth),
+	not(even(Depth)),
 	Eval2 =< Eval1, !.
