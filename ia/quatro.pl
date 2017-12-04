@@ -34,7 +34,7 @@ play(0):-
     choosePiece(Piece, RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor), % ask the AI to choose a piece for the opponnent
     write(0), write(' choosed a piece for its opponent:'), writeln(Piece),
     chooseMove(BoardSize, Move),
-    write(1), write( ' played the piece like a cuck:'), write(Piece), write(' in '), writeln(Move),
+    write(1), write( ' played the piece:'), write(Piece), write(' in '), writeln(Move),
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
     applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one
     play(1). % next turn!
@@ -46,7 +46,7 @@ play(1):-
     choosePiece(Piece, RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor), % ask the AI to choose a piece for the opponnent
     write(1), write(' choosed a piece for its opponent:'), writeln(Piece),
     chooseMoveMinMax(Piece, Move, 1),
-    write(0), write( ' played the piece like a chad:'), write(Piece), write(' in '), writeln(Move),
+    write(0), write( ' played the piece:'), write(Piece), write(' in '), writeln(Move),
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
     applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one
     play(0). % next turn!

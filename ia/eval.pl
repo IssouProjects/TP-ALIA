@@ -22,13 +22,13 @@ Board = [_,_,_,_,_,_,_,_,_,_,_,_,X10,Y10,Z10,T10], evalLine([X10,Y10,Z10,T10], S
 Value is S1+S2+S3+S4+S5+S6+S7+S8+S9+S10.
 
 % On verifie qu'il n'y ait pas plus d'une valeur différente par ligne, et on retourne cette valeur Z si elle existe
-transformNulls(Line, Z):- transformNull(Line, Z, 0), transformNull(Line, Z, 1),transformNull(Line, Z, 2),transformNull(Line, Z, 3).
-transformNull(Line, _, N):- nth0(N,Line,X), var(X).
-transformNull(Line, Z, N):- nth0(N,Line,X), nonvar(X), Z is X.
+getCommonValues(Line, Z):- getCommonValue(Line, Z, 0), getCommonValue(Line, Z, 1),getCommonValue(Line, Z, 2),getCommonValue(Line, Z, 3).
+getCommonValue(Line, _, N):- nth0(N,Line,X), var(X).
+getCommonValue(Line, Z, N):- nth0(N,Line,X), nonvar(X), Z is X.
 
 % Fonction qui évalue la ligne en fonction du nombre de caractéristiques similaires et potentiellement gagnante sur la ligne
-evalLine(Line, Value):- transformNulls(Line, Z), var(Z), Value is 0, !.
-evalLine(Line, Value):- transformNulls(Line, Z), nonvar(Z), evalNbSimi(Line, Z, NbSimi), Value is NbSimi**NbSimi, !.
+evalLine(Line, Value):- getCommonValues(Line, Z), var(Z), Value is 0, !.
+evalLine(Line, Value):- getCommonValues(Line, Z), nonvar(Z), evalNbSimi(Line, Z, NbSimi), Value is NbSimi**NbSimi, !.
 evalLine(_, Value):- Value is 0.
 
 % calculate the number of similar pieces in the line
