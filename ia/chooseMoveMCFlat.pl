@@ -83,14 +83,14 @@ testMoveMCF(Move, Piece, Player, I, Count, FinalCount) :-
 % randomEndGame(Player, DidWeWin, OriginalPlayer) : finish a game and tells us the winner. DidWeWin = 1 if OriginalPlayer won,
 %                                                   DidWeWin = 0 if OriginalPlayer loses.
 % Algo : each player plays, one after another, till the game ends.
-randomEndGame(Player, 1, OriginalPlayer):- Player is OriginalPlayer, gameoverMTFlat, !.
-randomEndGame(Player, 0, OriginalPlayer):- not(Player is OriginalPlayer), gameoverMTFlat, !.
+randomEndGame(Player, 1, OriginalPlayer):- Player is OriginalPlayer, gameoverMCFlat, !.
+randomEndGame(Player, 0, OriginalPlayer):- not(Player is OriginalPlayer), gameoverMCFlat, !.
 randomEndGame(Player, DidWeWin, OriginalPlayer) :-
     boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor), remainingPieces(RemainingPieces),
     %displayBoard(BoardSize, BoardShape, BoardHole, BoardColor),
     choosePiece(Piece, RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor), % ask the AI to choose a piece for the opponnent
     changePlayer(Player, NextPlayer), % change to the player that will place the spiece
-    chooseMove(BoardSize, Move),
+    chooseMoveRandom(BoardSize, Move),
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
     applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one
     randomEndGame(NextPlayer, DidWeWin, OriginalPlayer). % next turn!
@@ -98,9 +98,9 @@ randomEndGame(Player, DidWeWin, OriginalPlayer) :-
 % gameoverMTFlat : is true if the game is over
 %
 % Algo : check if one player won the game or if the board is full
-gameoverMTFlat :- boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor),
+gameoverMCFlat :- boardSize(BoardSize), boardShape(BoardShape), boardHole(BoardHole), boardColor(BoardColor),
   win(BoardSize,BoardHole,BoardColor,BoardShape).
-gameoverMTFlat :- boardShape(BoardShape),isBoardFull(BoardShape).
+gameoverMCFlat :- boardShape(BoardShape),isBoardFull(BoardShape).
 
 % saveStates : saves the state of the Board
 %

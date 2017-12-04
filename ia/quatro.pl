@@ -11,7 +11,7 @@
 :- consult(end).
 :- consult(player).
 :- consult(util).
-:- consult(chooseMoveMTFlat).
+:- consult(chooseMoveMCFlat).
 :- consult(minMax).
 :- consult(eval).
 
@@ -34,7 +34,6 @@ play(0):-
     choosePiece(Piece, RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor), % ask the AI to choose a piece for the opponnent
     write(0), write(' choosed a piece for its opponent:'), writeln(Piece),
     chooseMove(BoardSize, Move),
-    %iaChooseMove2(Piece, Move),
     write(1), write( ' played the piece like a cuck:'), write(Piece), write(' in '), writeln(Move),
     playMove(BoardSize, BoardShape, BoardHole, BoardColor, Move, Piece, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor),  % Play the move and get the result in a new Board
     applyEntireMove(BoardSize, BoardShape, BoardHole, BoardColor, NewBoardSize, NewBoardShape, NewBoardHole, NewBoardColor), % Remove the old board from the KB and store the new one
