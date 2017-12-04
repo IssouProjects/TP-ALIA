@@ -1,5 +1,5 @@
 % BestMove is the optimal move with the SelectedPiece on the current Board
-iaChooseMoveMinimax(SelectedPiece, BestMove, Depth):-
+chooseMoveMinMax(SelectedPiece, BestMove, Depth):-
 	boardShape(BoardShape), boardSize(BoardSize), boardHole(BoardHole), boardColor(BoardColor),
 	remainingPieces(RemainingPieces),
  	minimax(BoardShape, BoardSize, BoardColor, BoardHole, RemainingPieces, SelectedPiece, BestMove, _, Depth).

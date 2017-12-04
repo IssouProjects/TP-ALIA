@@ -1,6 +1,3 @@
-% récupérer toutes les lignes intéressantes
-%eval(Board, EvaluationValue).
-
 % Evalue chaque plateau, puis aditionne leurs évaluations
 evalAllBoard(BoardSize, BoardShape, BoardHole, BoardColor, Value):-
   evalBoard(BoardSize, S0),
