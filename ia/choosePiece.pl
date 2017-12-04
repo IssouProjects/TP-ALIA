@@ -6,7 +6,7 @@ winWithThisPiece(Piece, BoardSize, BoardShape, BoardHole, BoardColor):-
   win(NewBoardSize,NewBoardHole,NewBoardColor,NewBoardShape).
 
 % IA pour le choix d'une piece pour l'adversaire
-iaChoosePiece(Piece,RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor) :-
+choosePiece(Piece,RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColor) :-
   nth0(_, RemainingPieces, Piece),
   \+winWithThisPiece(Piece, BoardSize, BoardShape, BoardHole, BoardColor),
   supprime(Piece,RemainingPieces, NewRemainingPieces),
@@ -14,4 +14,5 @@ iaChoosePiece(Piece,RemainingPieces, BoardSize, BoardShape, BoardHole, BoardColo
   assert(remainingPieces(NewRemainingPieces)), !.
 
 % If we can only loose, we pick a random Piece
-iaChoosePiece(Piece,RemainingPieces,_,_,_,_):- chooseRandomPiece(Piece, RemainingPieces).
+choosePiece(Piece,RemainingPieces,_,_,_,_):-
+  chooseRandomPiece(Piece, RemainingPieces).
